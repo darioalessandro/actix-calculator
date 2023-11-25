@@ -11,9 +11,11 @@ use actix_web::test;
 async fn test_multiplication() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
-    let req = test::TestRequest::get().uri("/multiplication?a=3&b=4").to_request();
+    let req = test::TestRequest::get()
+        .uri("/multiplication?a=3&b=4")
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -27,9 +29,11 @@ async fn test_multiplication() {
 async fn test_multiplication_with_decimals() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
-    let req = test::TestRequest::get().uri("/multiplication?a=3.5&b=4.3").to_request();
+    let req = test::TestRequest::get()
+        .uri("/multiplication?a=3.5&b=4.3")
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -43,9 +47,11 @@ async fn test_multiplication_with_decimals() {
 async fn test_addition() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
-    let req = test::TestRequest::get().uri("/addition?a=3&b=4").to_request();
+    let req = test::TestRequest::get()
+        .uri("/addition?a=3&b=4")
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -59,10 +65,12 @@ async fn test_addition() {
 async fn addition_with_overflow() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
     let max_f32 = std::f32::MAX;
-    let req = test::TestRequest::get().uri(&format!("/addition?a={}&b=1", max_f32)).to_request();
+    let req = test::TestRequest::get()
+        .uri(&format!("/addition?a={}&b=1", max_f32))
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -71,14 +79,16 @@ async fn addition_with_overflow() {
     let body: CalcResult = serde_json::from_str(&body).unwrap();
     assert_eq!(body.result, max_f32);
 }
-
+//asdfsadf
 #[actix_web::test]
 async fn test_substraction() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
-    let req = test::TestRequest::get().uri("/substraction?a=3&b=4").to_request();
+    let req = test::TestRequest::get()
+        .uri("/substraction?a=3&b=4")
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -92,10 +102,12 @@ async fn test_substraction() {
 async fn test_substraction_underflow() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
     let min_f32 = std::f32::MIN;
-    let req = test::TestRequest::get().uri(&format!("/substraction?a={}&b=1", min_f32)).to_request();
+    let req = test::TestRequest::get()
+        .uri(&format!("/substraction?a={}&b=1", min_f32))
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -109,9 +121,11 @@ async fn test_substraction_underflow() {
 async fn test_division() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
-    let req = test::TestRequest::get().uri("/division?a=3&b=4").to_request();
+    let req = test::TestRequest::get()
+        .uri("/division?a=3&b=4")
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     assert_eq!(resp.status(), 200);
     // Get body as json
@@ -125,9 +139,11 @@ async fn test_division() {
 async fn test_division_by_zero() {
     let db_url = std::env::var("PG_URL").unwrap();
     println!("DB_URL: {}", db_url);
-    common::dbmate_up(&db_url);
+    common::dbmate_rebuild(&db_url);
     let mut app = test::init_service(get_app()).await;
-    let req = test::TestRequest::get().uri("/division?a=3&b=0").to_request();
+    let req = test::TestRequest::get()
+        .uri("/division?a=3&b=0")
+        .to_request();
     let resp = test::call_service(&mut app, req).await;
     let body = test::read_body(resp).await;
     let body = String::from_utf8(body.to_vec()).unwrap();
