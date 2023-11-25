@@ -10,6 +10,7 @@ use actix_web::{
     web::{self, Json},
     App, Error, HttpResponse,
 };
+use serde::{Deserialize, Serialize};
 
 use crate::auth::{
     fetch_oauth_request, generate_and_store_oauth_request, request_token, upsert_user,
@@ -19,7 +20,6 @@ use crate::{
     db::{get_pool, PostgresPool},
 };
 use reqwest::header::LOCATION;
-use types::HelloResponse;
 
 const OAUTH_CLIENT_ID: &str = std::env!("OAUTH_CLIENT_ID");
 const OAUTH_AUTH_URL: &str = std::env!("OAUTH_AUTH_URL");
@@ -138,14 +138,46 @@ async fn handle_google_oauth_callback(
     Ok(response.finish())
 }
 
-/**
- * Sample service
- */
-#[get("/hello/{name}")]
-async fn greet(name: web::Path<String>) -> Json<HelloResponse> {
-    Json(HelloResponse {
-        name: name.to_string(),
-    })
+#[derive(Serialize, Deserialize)]
+pub struct MyQuery {
+    pub a: f32,
+    pub b: f32,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct CalcResult {
+    pub result: f32,
+}
+
+#[get("/multiplication")]
+async fn multiplication(query: web::Query<MyQuery>) -> Json<CalcResult> {
+    let result = query.a * query.b;
+    Json(CalcResult { result })
+}
+#[get("/addition")]
+async fn addition(query: web::Query<MyQuery>) -> Json<CalcResult> {
+    let result = query.a + query.b;
+    Json(CalcResult { result })
+}
+
+#[get("/substraction")]
+async fn substraction(query: web::Query<MyQuery>) -> Json<CalcResult> {
+    let result = query.a - query.b;
+    Json(CalcResult { result })
+}
+
+/// Returns a Result with the division of a and b.
+/// if b is zero, returns a 400 error.
+#[get("/division")]
+async fn division(query: web::Query<MyQuery>) -> Result<HttpResponse, Error> {
+    // If division by zero using an epsylon, return a 400 error.
+
+    if query.b.abs() < std::f32::EPSILON {
+        return Err(error::ErrorBadRequest("Division by zero"));
+    }
+
+    let result = query.a / query.b;
+    Ok(HttpResponse::Ok().json(CalcResult { result }))
 }
 
 pub fn get_app() -> App<
@@ -174,7 +206,10 @@ pub fn get_app() -> App<
     App::new()
         .app_data(web::Data::new(pool))
         .wrap(cors)
-        .service(greet)
+        .service(multiplication)
+        .service(addition)
+        .service(substraction)
+        .service(division)
         .service(handle_google_oauth_callback)
         .service(login)
 }
